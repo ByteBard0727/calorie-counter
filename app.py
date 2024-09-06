@@ -9,17 +9,31 @@ app.config['SQLALCHEMY_DATABASE_URI'] = 'mssql+pyodbc://sa:<YourPassword>@localh
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 #define the db
-db = SQLAlchemy
+db = SQLAlchemy(app)
+
+#define the db model this will let flask-sqlalchemy map a route to the table and the right column created in dbeaver
+class User(db.Model):
+    __tablename__ = 'User'
+    UserID = db.Column(db.Integer, primary_key=True)
+    last_login = db.Column(db.DateTime)
+
+#initialie the db
+with app.app_context():
+    db.create_all()
 
 #The homepage with, current date, date lastlogin and last weight/diet/
-@app.route('/home')
+@app.route('/')
 def home():
-    current_date = datetime.now() .strftime('%d-%m-%Y')
-    last_login = 
+    user = User.query.first()
 
-    last_weight = 
-    last_diet =
-    return render_template('index.html', current_date=current_date')
+    if user and user.last_login:
+        last_login = user.last_login.strftime('%d-%m-%Y %H:%M:%S')
+    else:
+        last_login = None
+
+    current_date = datetime.now().strftime('%d-%m-%Y')
+
+    return render_template('index.html', current_date=current_date, last_login=last_login)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()
