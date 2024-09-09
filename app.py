@@ -1,4 +1,4 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -31,10 +31,11 @@ class User(db.Model):
     def check_password(self, password):
         return check_password_hash(self.Password, password)
 
-#initialie the db
+#initialize the db
 with app.app_context():
     db.create_all()
 
+#Map to the register page using the forms from the imported RegistrationForm
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -44,13 +45,15 @@ def register():
             flash('Email already registered. Please use a different one.')
             return redirect(url_for('register'))
 
-        hashed_password = generate_password_hash(form.password.data, method='sha256')
-        new_user = User(username=form.username.data, email=form.Email.data, password_hash=hashed_password)
+        hashed_password = generate_password_hash(form.Password.data, method='sha256')
+        new_user = User(username=form.Username.data, email=form.Email.data, password_hash=hashed_password)
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! You can now log in.', 'success')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
+
+
 
 #The homepage with, current date, date lastlogin and last weight/diet/
 @app.route('/')
