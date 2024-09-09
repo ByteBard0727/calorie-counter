@@ -2,7 +2,7 @@ from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
-from forms import RegistrationForm
+from forms import RegistrationForm, LoginForm
 
 app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mew'  # For CSRF protection
@@ -35,7 +35,7 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
-#Map to the register page using the forms from the imported RegistrationForm
+#Map to the register page using the forms from the imported Forms
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -50,10 +50,16 @@ def register():
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! You can now log in.', 'success')
-        return redirect(url_for('login'))
+        return redirect(url_for('/login'))
     return render_template('register.html', form=form)
 
 
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        return redirect('/')
+    return render_template('login.html', form=form)
 
 #The homepage with, current date, date lastlogin and last weight/diet/
 @app.route('/')
