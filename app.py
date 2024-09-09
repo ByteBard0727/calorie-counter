@@ -35,39 +35,38 @@ class User(db.Model):
 with app.app_context():
     db.create_all()
 
+@app.route('/', methods=['GET', 'POST'])
+def login():
+    form = LoginForm()
+    if form.validate_on_submit():
+        return redirect('home')
+    return render_template('login.html', form=form)
+
 #Map to the register page using the forms from the imported Forms
 @app.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
     if form.validate_on_submit():
         # Check if email is already registered
-        if User.query.filter_by(email=form.Email.data).first():
+        if User.query.filter_by(Email=form.Email.data).first():
             flash('Email already registered. Please use a different one.')
             return redirect(url_for('register'))
 
-        hashed_password = generate_password_hash(form.Password.data, method='sha256')
-        new_user = User(username=form.Username.data, email=form.Email.data, password_hash=hashed_password)
+        hashed_password = generate_password_hash(form.Password.data, method='pbkdf2:sha256')
+        new_user = User(Username=form.Username.data, Email=form.Email.data, Password=hashed_password, JoinDate=JoinDate.data)
         db.session.add(new_user)
         db.session.commit()
         flash('Registration successful! You can now log in.', 'success')
-        return redirect(url_for('/login'))
+        return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-    form = LoginForm()
-    if form.validate_on_submit():
-        return redirect('/')
-    return render_template('login.html', form=form)
-
 #The homepage with, current date, date lastlogin and last weight/diet/
-@app.route('/')
+@app.route('/home')
 def home():
-    user = User.query.first()
+    User = User.query.first()
 
-    if user and user.last_login:
-        last_login = user.last_login.strftime('%d-%m-%Y %H:%M:%S')
+    if User and User.last_login:
+        last_login = User.last_login.strftime('%d-%m-%Y %H:%M:%S')
     else:
         last_login = "Welcome! this is the first time you have logged in"
 
