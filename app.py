@@ -5,9 +5,9 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from forms import RegistrationForm, LoginForm
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 
+app = Flask(__name__)
 
 # for CSRF protection
-app = Flask(__name__)
 app.config['SECRET_KEY'] = 'mew'
 
 #config SQLAlchemy
@@ -17,20 +17,16 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 #define the db
 db = SQLAlchemy(app)
 
-#init the loginmanager
-login_manager = LoginManager()
-login_manager.init_app(app)
-login_manager.login_view = 'login'
-
 #define the db model this will let flask-sqlalchemy map a route to the table and the right column created in dbeaver
 class User(db.Model, UserMixin):
     __tablename__ = 'User'
     UserID = db.Column(db.Integer, primary_key=True)
     last_login = db.Column(db.DateTime)
     weight = db.Column(db.Float)
+    JoinDate = db.Column(db.DateTime)
     calories = db.Column(db.Integer)
     Username = db.Column(db.String(50), unique=True, nullable=False)
-    Password = db.Column(db.String(128))
+    Password = db.Column(db.String(128), nullable=False)
     Email = db.Column(db.String(255), unique=True, nullable=False)
 
     def set_Password(self, password):
@@ -39,13 +35,30 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.Password, password)
     
-#instructions for flasklogin to load users from dbeaver
-def load_user(user_id):
-    return User.query.get(int(user_id))
+    def get_id(self):
+        return self.UserID
+    
+#define the diet table of the db and map routes to different tables and columns
+class Diet(db.Model):
+    __tablename__ = 'Diet'
+    Recordnr = db.Column(db.Integer, primary_key=True)
+    proteine = db.Column(db.String)
+    carbs = db.Column(db.Float)
+    fat = db.Column(db.Float)
+    caloric_value = db.Column(db.Integer)
 
 #initialize the db
 with app.app_context():
     db.create_all()
+
+#init the loginmanager
+login_manager = LoginManager(app)
+login_manager.login_view = 'login'
+
+#instructions for flasklogin to load users from dbeaver
+@login_manager.user_loader
+def load_user(UserID):
+    return User.query.get(int(UserID))
 
 @app.route('/', methods=['GET', 'POST'])
 def login():
@@ -78,16 +91,20 @@ def register():
 
 #The homepage with, current date, date lastlogin and last weight/diet/
 @app.route('/home')
+def home():
+    return f"just testing"
 
 @app.route('/dashboard')
 @login_required
-def home():
+def dashboard():
     user = User.query.first()
 
     if user and user.last_login:
         last_login = user.last_login.strftime('%d-%m-%Y %H:%M:%S')
     else:
         last_login = "Welcome! this is the first time you have logged in"
+
+    
 
     current_date = datetime.now().strftime('%d-%m-%Y')
 
