@@ -23,7 +23,7 @@ class User(db.Model, UserMixin):
     UserID = db.Column(db.Integer, primary_key=True)
     last_login = db.Column(db.DateTime)
     Weight = db.Column(db.Float)
-    JoinDate = db.Column(db.DateTime)
+    JoinDate = db.Column(db.DateTime, default=datetime.now)
     calories = db.Column(db.Integer)
     Username = db.Column(db.String(50), unique=True, nullable=False)
     Password = db.Column(db.String(128), nullable=False)
@@ -84,10 +84,10 @@ def register():
             return redirect(url_for('register'))
 
         hashed_password = generate_password_hash(form.Password.data, method='pbkdf2:sha256')
-        new_user = User(Username=form.Username.data, Email=form.Email.data, Password=hashed_password, JoinDate=JoinDate.data)
+        new_user = User(Username=form.Username.data, Email=form.Email.data, Password=hashed_password, JoinDate=datetime.now())
         db.session.add(new_user)
         db.session.commit()
-        flash('Registration successful! You can now log in.', 'success')
+        flash('Registration successful! You can now log in.')
         return redirect(url_for('login'))
     return render_template('register.html', form=form)
 
@@ -105,18 +105,18 @@ def dashboard():
         last_login = user.last_login.strftime('%d-%m-%Y %H:%M:%S')
     else:
         last_login = "Welcome! this is the first time you have logged in"
-
     Weight = "Could not find prior weight records"
     if user and user.Weight:
         Weight = user.Weight
-    
-    calories = "Could not find prior Calorie records"
+        calories = "Could not find prior Caloric intake records"
     if user and user.calories:
         calories = user.calories
-
     current_date = datetime.now().strftime('%d-%m-%Y')
 
+
+
     return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight, calories=calories)
+
 
 if __name__ == '__main__':
     app.run(debug=True)
