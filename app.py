@@ -22,7 +22,7 @@ class User(db.Model, UserMixin):
     __tablename__ = 'User'
     UserID = db.Column(db.Integer, primary_key=True)
     last_login = db.Column(db.DateTime)
-    weight = db.Column(db.Float)
+    Weight = db.Column(db.Float)
     JoinDate = db.Column(db.DateTime)
     calories = db.Column(db.Integer)
     Username = db.Column(db.String(50), unique=True, nullable=False)
@@ -99,19 +99,22 @@ def home():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user = User.query.first()
+    user = User.query.filter_by(UserID=current_user.UserID).first()
 
     if user and user.last_login:
         last_login = user.last_login.strftime('%d-%m-%Y %H:%M:%S')
     else:
         last_login = "Welcome! this is the first time you have logged in"
 
-    if user and user.weight:
-        weight = user.weight
+    Weight = "Could not find prior weight records"
+    if user and user.Weight:
+        Weight = user.Weight
+    
+
 
     current_date = datetime.now().strftime('%d-%m-%Y')
 
-    return render_template('index.html', current_date=current_date, last_login=last_login)
+    return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight)
 
 if __name__ == '__main__':
     app.run(debug=True)
