@@ -110,11 +110,13 @@ def dashboard():
     if user and user.Weight:
         Weight = user.Weight
     
-
+    calories = "Could not find prior Calorie records"
+    if user and user.calories:
+        calories = user.calories
 
     current_date = datetime.now().strftime('%d-%m-%Y')
 
-    return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight)
+    return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight, calories=calories)
 
 if __name__ == '__main__':
     app.run(debug=True)
