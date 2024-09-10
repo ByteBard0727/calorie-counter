@@ -67,6 +67,8 @@ def login():
         user = User.query.filter_by(Username=form.Username.data).first()
         if user and user.check_password(form.Password.data):
             login_user(user)
+            user.last_login = datetime.now()
+            db.session.commit()
             return redirect(url_for('dashboard'))
         else:
             flash('Unable to login. Check your username and password.')
@@ -104,7 +106,8 @@ def dashboard():
     else:
         last_login = "Welcome! this is the first time you have logged in"
 
-    
+    if user and user.weight:
+        weight = user.weight
 
     current_date = datetime.now().strftime('%d-%m-%Y')
 
