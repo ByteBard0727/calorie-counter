@@ -1,0 +1,3 @@
+Currently the application is running with a dockerized version of mssql on my localhost. 
+The database is setup with dbeaver and connecting with the mssql container using SQL Server.
+For the webserver at the moment I am using Flask just for local testing, but this might change in the future as I have some hosting services in mind.
