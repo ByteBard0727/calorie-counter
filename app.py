@@ -112,10 +112,28 @@ def dashboard():
     if user and user.calories:
         calories = user.calories
     current_date = datetime.now().strftime('%d-%m-%Y')
-
-
-
     return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight, calories=calories)
+
+@app.route('/weight_forecast')
+@login_required
+def weight_forecast():
+    user= User.query.filterby(UserID=current_user.UserID).first()
+
+    
+@app.route('/dish_cal_predictor')
+@login_required
+def dish_cal_predictor():
+
+@app.route('/exercise_calorie_forecast')
+@login_required
+def exercise_calorie_forecast():
+
+@app.route('/goal_planner')
+@login_required
+def goal_planner():
+
+
+
 
 
 if __name__ == '__main__':
