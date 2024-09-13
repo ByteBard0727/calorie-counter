@@ -38,10 +38,6 @@ class User(db.Model, UserMixin):
     def get_id(self):
         return self.UserID
     
-class Dish(db.Model)
-        __tablename__ = 'Dish'
-        dishid = db.Column(db.Integer, primary_key=True)
-        
 
 #define the diet table of the db and map routes to different tables and columns
 class Diet(db.Model):
@@ -51,19 +47,25 @@ class Diet(db.Model):
     carbs = db.Column(db.Float)
     fat = db.Column(db.Float)
     caloric_value = db.Column(db.Integer)
-
-
-
-class UserDiet(db.Model):
-    __tablename__ = 'UserDiet'
-
     
-class Dish(.db.Model):
+class Dish(db.Model):
     __tablename__ = 'Dish'
     dishid = db.Column(db.Integer, primary_key=True)
     dish_name = db.Column(db.String)
     total_calories = db.Column(db.Integer)
 
+class UserDiet(db.Model):
+    __tablename__ = 'UserDiet'
+    user_diet_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.Foreign_key('User.UserID'))
+    diet_id = db.Column(db.Integer, db.Foreign_key('Dish.dishid'))
+    date_eaten = db.Column(db.Datetime)
+    fat = db.Column(db.Float)
+    vegetable = db.Culmn(db.Float)
+    carbs = db.Column(db.Integer)
+    portionsize = db.Column(db.Float)
+    caloric_value = db.Column(db.Interger)
+    proteine = db.Column(db.Float)
 
 #initialize the db
 with app.app_context():
@@ -141,16 +143,18 @@ def weight_forecast():
 @app.route('/dish_cal_predictor')
 @login_required
 def dish_cal_predictor():
-    user= Dish.query.filterby(dishid=current_user)
+    user = user_diet_id.query.filterby(dishid=current_user)
 
 @app.route('/exercise_calorie_forecast')
 @login_required
 def exercise_calorie_forecast():
+    user = 
+
 
 @app.route('/goal_planner')
 @login_required
 def goal_planner():
-
+    user = 
 
 
 
