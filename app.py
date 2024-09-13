@@ -1,6 +1,6 @@
 from flask import Flask, render_template, redirect, url_for, flash
 from flask_sqlalchemy import SQLAlchemy
-from datetime import datetime
+from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 from forms import RegistrationForm, LoginForm
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -38,8 +38,7 @@ class User(db.Model, UserMixin):
     def get_id(self):
         return self.UserID
     
-
-#define the diet table of the db and map routes to different tables and columns
+#define the diet table of the db and map routes to different tables and columns creating a class
 class Diet(db.Model):
     __tablename__ = 'Diet'
     diet_id = db.Column(db.Integer, primary_key=True)
@@ -47,25 +46,29 @@ class Diet(db.Model):
     carbs = db.Column(db.Float)
     fat = db.Column(db.Float)
     caloric_value = db.Column(db.Integer)
-    
+
+#define the diet table of the db and map routes to different tables and columns creating a class    
 class Dish(db.Model):
     __tablename__ = 'Dish'
     dishid = db.Column(db.Integer, primary_key=True)
-    dish_name = db.Column(db.String)
+    dish_name = db.Column(db.String(100))
     total_calories = db.Column(db.Integer)
 
+#define the UserDiet table of the db and map routes to different tables and columns creating a class
 class UserDiet(db.Model):
     __tablename__ = 'UserDiet'
     user_diet_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.Foreign_key('User.UserID'))
     diet_id = db.Column(db.Integer, db.Foreign_key('Dish.dishid'))
     date_eaten = db.Column(db.Datetime)
-    fat = db.Column(db.Float)
-    vegetable = db.Culmn(db.Float)
-    carbs = db.Column(db.Integer)
+    fat = db.Column(db.String(20))
+    vegetable = db.Culmn(db.String(20))
+    carbs = db.Column(db.String(20))
     portionsize = db.Column(db.Float)
     caloric_value = db.Column(db.Interger)
     proteine = db.Column(db.Float)
+
+    user = db.relationship('User', backref='user_diets')
 
 #initialize the db
 with app.app_context():
@@ -134,24 +137,44 @@ def dashboard():
     current_date = datetime.now().strftime('%d-%m-%Y')
     return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight, calories=calories)
 
-@app.route('/weight_forecast')
+@app.route('/weight_forecast', methods =['GET', 'Post']))
 @login_required
 def weight_forecast():
-    user= User.query.filterby(UserID=current_user.UserID).first()
+    current_user_id = UserDiet.query.filterby(UserID=current_user.UserID).first()
 
     
-@app.route('/dish_cal_predictor')
+@app.route('/dish_cal_predictor', methods =['GET', 'Post']))
 @login_required
 def dish_cal_predictor():
-    user = user_diet_id.query.filterby(dishid=current_user)
+    #specify the current day and store in value today
+    today = datetime.now()
+    #specify when the start of the day is
+    start_of_day = datetime(today.year, today.month, today.day, 0, 0, 0)
+    #specify the end of the day by adding 1 day to the start of the day and then subtracting 1 second to signify end of the day
+    end_of_day = start_of_day + timedelta(days=1) - timedelta(seconds=1)
+    #making sure to get the id for the current user
+    current_user_id = current_user.UserID
+    #asking the UserDiet table to sum all the values in the different cells filtered between the start and the end of the day 
+    total_calories = db.session.query(db.func.sum(UserDiet.caloric_value)).filter(
+        UserDiet.UserID == current_user_id,
+        UserDiet.date_eaten >= start_of_day,
+        UserDiet.date_eaten <= end_of_day
+    ).scalar()
+    if total_calories is None:
+        total_calories = 0
+    print(f"Total calories consumed today: {total_calories}")
 
-@app.route('/exercise_calorie_forecast')
+    
+
+
+#to 
+@app.route('/exercise_calorie_forecast', methods =['GET', 'Post']))
 @login_required
 def exercise_calorie_forecast():
     user = 
 
 
-@app.route('/goal_planner')
+@app.route('/goal_planner', methods =['GET', 'Post'])
 @login_required
 def goal_planner():
     user = 

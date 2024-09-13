@@ -15,4 +15,8 @@ class LoginForm(FlaskForm):
     Password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
-class 
+class FoodForm(FlaskForm):
+
+class ExcerciseForm(FlaskForm):
+
+class GoalForm(FlaskForm):
