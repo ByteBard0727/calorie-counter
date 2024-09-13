@@ -28,7 +28,7 @@ class User(db.Model, UserMixin):
     Username = db.Column(db.String(50), unique=True, nullable=False)
     Password = db.Column(db.String(128), nullable=False)
     Email = db.Column(db.String(255), unique=True, nullable=False)
-
+        
     def set_Password(self, password):
         self.Password = generate_password_hash(password)
 
@@ -38,14 +38,32 @@ class User(db.Model, UserMixin):
     def get_id(self):
         return self.UserID
     
+class Dish(db.Model)
+        __tablename__ = 'Dish'
+        dishid = db.Column(db.Integer, primary_key=True)
+        
+
 #define the diet table of the db and map routes to different tables and columns
 class Diet(db.Model):
     __tablename__ = 'Diet'
-    Recordnr = db.Column(db.Integer, primary_key=True)
+    diet_id = db.Column(db.Integer, primary_key=True)
     proteine = db.Column(db.String)
     carbs = db.Column(db.Float)
     fat = db.Column(db.Float)
     caloric_value = db.Column(db.Integer)
+
+
+
+class UserDiet(db.Model):
+    __tablename__ = 'UserDiet'
+
+    
+class Dish(.db.Model):
+    __tablename__ = 'Dish'
+    dishid = db.Column(db.Integer, primary_key=True)
+    dish_name = db.Column(db.String)
+    total_calories = db.Column(db.Integer)
+
 
 #initialize the db
 with app.app_context():
@@ -123,6 +141,7 @@ def weight_forecast():
 @app.route('/dish_cal_predictor')
 @login_required
 def dish_cal_predictor():
+    user= Dish.query.filterby(dishid=current_user)
 
 @app.route('/exercise_calorie_forecast')
 @login_required
