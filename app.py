@@ -58,14 +58,14 @@ class Dish(db.Model):
 class UserDiet(db.Model):
     __tablename__ = 'UserDiet'
     user_diet_id = db.Column(db.Integer, primary_key=True)
-    user_id = db.Column(db.Integer, db.Foreign_key('User.UserID'))
-    diet_id = db.Column(db.Integer, db.Foreign_key('Dish.dishid'))
-    date_eaten = db.Column(db.Datetime)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.UserID'))
+    diet_id = db.Column(db.Integer, db.ForeignKey('Dish.dishid'))
+    date_eaten = db.Column(db.DateTime)
     fat = db.Column(db.String(20))
-    vegetable = db.Culmn(db.String(20))
+    vegetable = db.Column(db.String(20))
     carbs = db.Column(db.String(20))
     portionsize = db.Column(db.Float)
-    caloric_value = db.Column(db.Interger)
+    caloric_value = db.Column(db.Integer)
     proteine = db.Column(db.Float)
 
     user = db.relationship('User', backref='user_diets')
@@ -129,21 +129,22 @@ def dashboard():
     else:
         last_login = "Welcome! this is the first time you have logged in"
     Weight = "Could not find prior weight records"
+    calories = "Could not find prior Caloric intake records"
     if user and user.Weight:
         Weight = user.Weight
-        calories = "Could not find prior Caloric intake records"
     if user and user.calories:
         calories = user.calories
+        calories = "Could not find prior Caloric intake records"
     current_date = datetime.now().strftime('%d-%m-%Y')
     return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight, calories=calories)
 
-@app.route('/weight_forecast', methods =['GET', 'Post']))
+@app.route('/weight_forecast', methods =['GET', 'Post'])
 @login_required
 def weight_forecast():
     current_user_id = UserDiet.query.filterby(UserID=current_user.UserID).first()
 
     
-@app.route('/dish_cal_predictor', methods =['GET', 'Post']))
+@app.route('/dish_cal_predictor', methods =['GET', 'Post'])
 @login_required
 def dish_cal_predictor():
     #specify the current day and store in value today
@@ -155,29 +156,36 @@ def dish_cal_predictor():
     #making sure to get the id for the current user
     current_user_id = current_user.UserID
     #asking the UserDiet table to sum all the values in the different cells filtered between the start and the end of the day 
-    total_calories = db.session.query(db.func.sum(UserDiet.caloric_value)).filter(
-        UserDiet.UserID == current_user_id,
+    total_day_calories = db.session.query(db.func.sum(UserDiet.caloric_value)).filter(
+        UserDiet.user_id == current_user_id,
         UserDiet.date_eaten >= start_of_day,
         UserDiet.date_eaten <= end_of_day
     ).scalar()
-    if total_calories is None:
-        total_calories = 0
-    print(f"Total calories consumed today: {total_calories}")
+    if total_day_calories is None:
+        total_day_calories = 0
+    print(f"Total calories consumed today: {total_day_calories}")
 
     
 
 
-#to 
-@app.route('/exercise_calorie_forecast', methods =['GET', 'Post']))
+#route to the calorie forecast app
+@app.route('/exercise_calorie_forecast', methods =['GET', 'Post'])
 @login_required
 def exercise_calorie_forecast():
-    user = 
+    current_user_id = current_user.UserID
+
+    db.session.query(db.func.sum(UserDiet.caloric_value)).filter(
+        UserDiet.UserID == current_user_id,
+        UserDiet.date_eaten >= start_of_day,
+        UserDiet.date_eaten <= end_of_day,
+    ).scalar()
+
 
 
 @app.route('/goal_planner', methods =['GET', 'Post'])
 @login_required
 def goal_planner():
-    user = 
+    print("maintenance")
 
 
 
