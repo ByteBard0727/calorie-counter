@@ -70,16 +70,22 @@ class UserDiet(db.Model):
 
     user = db.relationship('User', backref='user_diets')
 
-#defining the Weight table to later be able to reference to historic data
+#defining the Weight table
 class UserWeight(db.Model):
-    __tablename__ = UserWeight
+    __tablename__ = 'WeightHistory'
     weight_id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('User.UserID'))
     weight = db.Column(db.Float)
     date = db.Column(db.DateTime)
 
 class UserExercise
-
+    __tablename__ = 'Exercise'
+    exercise_id = db.Column(db.Integer, primary_key=True)
+    duration = db.Column(db.Time)
+    calories_burned = db.Column(db.Integer)
+    exercise_type = db.Column(db.String)
+    date_performed = db.Column(db.DateTime)
+    exercise_type = db.Column(db.String(100))
 
 class UserGoal
 
