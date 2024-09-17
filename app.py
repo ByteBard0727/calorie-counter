@@ -78,16 +78,23 @@ class UserWeight(db.Model):
     weight = db.Column(db.Float)
     date = db.Column(db.DateTime)
 
-class UserExercise
+class UserExercise(db.Model):
     __tablename__ = 'Exercise'
     exercise_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.UserID'))
     duration = db.Column(db.Time)
     calories_burned = db.Column(db.Integer)
     exercise_type = db.Column(db.String)
     date_performed = db.Column(db.DateTime)
     exercise_type = db.Column(db.String(100))
 
-class UserGoal
+class UserGoal(db.Model):
+    __tablename__ = 'Goal'
+    goal_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.UserID'))
+    goal_type = db.Column(db.String(100))
+    target_value = db.Column(db.Float)
+    target_date = db.Column(db.DateTime)
 
 #initialize the db
 with app.app_context():
@@ -205,9 +212,6 @@ def exercise_calorie_forecast():
 @login_required
 def goal_planner():
     print("maintenance")
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
