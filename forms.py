@@ -16,7 +16,8 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Login')
 
 class FoodForm(FlaskForm):
-
+    print("maintenance")
 class ExcerciseForm(FlaskForm):
-
+    print("maintenance")
 class GoalForm(FlaskForm):
+    print("maintenance")
