@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, redirect, url_for, flash
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_user, login_required, logout_user, current_user
 from __init__ import db
 from forms import RegistrationForm, LoginForm
@@ -16,8 +16,11 @@ def login():
         user = User.query.filter_by(Username=form.Username.data).first()
         if user and user.check_password(form.Password.data):
             login_user(user)
+            
+            user.last_login = user.last_login
             user.last_login = datetime.now()
             db.session.commit()
+            
             return redirect(url_for('main.dashboard'))
         else:
             flash('Unable to login. Check your username and password.')
@@ -48,12 +51,15 @@ def home():
 def dashboard():
     user = User.query.filter_by(UserID=current_user.UserID).first()
 
+    last_login = request.args.get('last_login', user.last_login)
     if user and user.last_login:
         last_login = user.last_login.strftime('%d-%m-%Y %H:%M:%S')
     else:
         last_login = "Welcome! this is the first time you have logged in"
+
     Weight = "Could not find prior weight records"
     calories = "Could not find prior Caloric intake records"
+
     if user and user.Weight:
         Weight = user.Weight
     if user and user.calories:
