@@ -37,3 +37,9 @@ def get_start_and_end_of_week(user_id):
     end_of_week = start_of_week + timedelta(days=7) - timedelta(seconds=1)
 
 def get_total_week_consumed_calories(user_id):
+    start_of_week, end_of_week = get_start_and_end_of_week()
+    total_week_calories = db.session.query(db.func.sum(UserDiet.caloric_value)).filter(
+        UserDiet.user_id == user_id,
+        UserDiet.date_eaten >= start_of_week,
+        UserDiet.date_eaten <= end_of_week
+    ).scalar()
