@@ -15,9 +15,9 @@ def create_app():
     # Initialize extensions with the app
     db.init_app(app)
     login_manager.init_app(app)
-
+    
     # Register blueprints (routes)
-    from .routes import main as main_blueprint
+    from routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
     # Create the database tables
