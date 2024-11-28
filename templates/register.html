@@ -4,31 +4,55 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Register</title>
+    <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-    <h1>Register</h1>
-    <form method="POST">
-        {{ form.hidden_tag() }}
-        <div>
-            {{ form.Username.label }}
-            {{ form.Username() }}
-        </div>
-        <div>
-            {{ form.Email.label }}
-            {{ form.Email() }}
-        </div>
-        <div>
-            {{ form.Password.label }}
-            {{ form.Password() }}
-        </div>
-        <div>
-            {{ form.confirm_Password.label }}
-            {{ form.confirm_Password() }}
-        </div>
-        <div>
-            {{ form.submit() }}
-        </div>
-    </form>
-    <p>Already have an account? <a href="{{ url_for('main.login') }}">Login here</a></p>
+<body class="bg-gray-50">
+    <div class="max-w-sm mx-auto pt-20 flex items-center justify-center">
+        <p class="absolute top-5 font-semibold text-3xl">Register</p>
+
+        <!-- Horizontal line outside the container to take full width -->
+        <hr class="border-t-2 border-gray-200 mb-8 w-full absolute top-20 left-0" />
+
+        <form method="POST" class="w-full max-w-md">
+            <!-- Flask hidden tag -->
+            {{ form.hidden_tag() }}
+
+            <!-- Email Input -->
+            <div class="mb-6 pt-20">
+                <label for="email" class="block mb-2">Email</label>
+                {{ form.Email(class_="bg-gray-200 text-sm px-4 py-2 w-full", id="email", placeholder="Enter your email") }}
+            </div>
+
+            <!-- Username Input -->
+            <div class="mb-6">
+                <label for="username" class="block mb-2">Username</label>
+                {{ form.Username(class_="bg-gray-200 text-sm px-4 py-2 w-full", id="username", placeholder="Enter your username") }}
+            </div>
+
+            <!-- Password Input -->
+            <div class="mb-6">
+                <label for="password" class="block mb-2">Password</label>
+                {{ form.Password(class_="bg-gray-200 text-sm px-4 py-2 w-full", id="password", placeholder="Enter your password") }}
+            </div>
+
+            <!-- Confirm Password Input -->
+            <div class="mb-6">
+                <label for="confirm-password" class="block mb-2">Confirm Password</label>
+                {{ form.confirm_Password(class_="bg-gray-200 text-sm px-4 py-2 w-full", id="confirm-password", placeholder="Confirm your password") }}
+            </div>
+
+            <!-- Login Link -->
+            <div class="text-start mb-6">
+                <a href="{{ url_for('main.login') }}" class="text-gray-500 underline hover:text-blue-700">
+                    &gt; Login
+                </a>
+            </div>
+
+            <!-- Register Button -->
+            <div class="text-end">
+                {{ form.submit(class_="bg-green-400 px-6 py-2 text-white font-semibold") }}
+            </div>
+        </form>
+    </div>
 </body>
 </html>
