@@ -6,10 +6,9 @@ from datetime import datetime
 class User(db.Model, UserMixin):
     __tablename__ = 'User'
     UserID = db.Column(db.Integer, primary_key=True)
-    last_login = db.Column(db.DateTime)
     Weight = db.Column(db.Float)
     JoinDate = db.Column(db.DateTime, default=datetime.now)
-    calories = db.Column(db.Integer)
+    calories = db.Column(db.Integer(5))
     Username = db.Column(db.String(50), unique=True, nullable=False)
     Password = db.Column(db.String(128), nullable=False)
     Email = db.Column(db.String(255), unique=True, nullable=False)
@@ -79,3 +78,13 @@ class UserGoal(db.Model):
     goal_type = db.Column(db.String(100))
     target_value = db.Column(db.Float)
     target_date = db.Column(db.DateTime)
+
+class Session(db.Model):
+    __tablename__ = 'Session'
+    session_id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey('User.UserID'))
+    login_time = db.Column(db.DateTime, default=datetime.now)
+    logout_time = db.Column(db.DateTime)
+    session_duration = db.Column(db.Integer)
+    ip_address = db.Column(db.String(50))
+    user_agent =db.Column(db.String(255))
