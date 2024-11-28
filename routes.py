@@ -1,14 +1,19 @@
-from flask import Blueprint, render_template, redirect, url_for, flash, request
+from flask import Blueprint, render_template, redirect, url_for, flash, request, jsonify
 from flask_login import login_user, login_required, logout_user, current_user
 from __init__ import db
 from forms import RegistrationForm, LoginForm
-from models import User, UserDiet
+from models import User, UserDiet, Diet, UserExercise, UserGoal, UserWeight, Session
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 
 
 main = Blueprint('main', __name__)
 
+#first checking the user name by querying the User table searching for their username.
+#then completing the password checksum. If both are true continue if one is false flashcard unable to login
+#record the current login time storing it in 'login_time'
+#add a new entry in the Session table /record user_id, login_time, ip_address, user_agent
+#lastly update the 
 @main.route('/', methods=['GET', 'POST'])
 def login():
     form = LoginForm()
@@ -17,15 +22,20 @@ def login():
         if user and user.check_password(form.Password.data):
             login_user(user)
             
-            user.last_login = user.last_login
-            user.last_login = datetime.now()
+            login_time = datetime.now
+            session_entry = Session(
+                user_id=user.user_id,
+                login_time=login_time,
+                ip_address=request.remote_addr,
+                user_agent=request.header.get('User-Agent')
+            )
             db.session.commit()
-            
             return redirect(url_for('main.dashboard'))
         else:
             flash('Unable to login. Check your username and password.')
     return render_template('login.html', form=form)
 
+#Will stay on flask back-end for robust security
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     form = RegistrationForm()
@@ -42,13 +52,15 @@ def register():
         return redirect(url_for('main.login'))
     return render_template('register.html', form=form)
 
+#This route will be covered by front-end as it will be heavy on user interaction
 @main.route('/home')
 def home():
     return "just testing"
 
-@main.route('/dashboard')
+#This route will be covered by front-end as it will be heavy on user interaction
+@main.route('/api/dashboard', methods=['GET'])
 @login_required
-def dashboard():
+def api_dashboard():
     user = User.query.filter_by(UserID=current_user.UserID).first()
 
     last_login = request.args.get('last_login', user.last_login)
@@ -67,13 +79,15 @@ def dashboard():
     current_date = datetime.now().strftime('%d-%m-%Y')
     return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight, calories=calories)
 
+#This forecast will stay in the back-end and will be handled by flask since it is heave on computation
 @main.route('/weight_forecast', methods=['GET', 'POST'])
 @login_required
 def weight_forecast():
     current_user_id = current_user.UserID
     # Add logic here
 
-@main.route('/dish_cal_predictor', methods=['GET', 'POST'])
+#Heavy on user interaction will be on the frontend
+@main.route('/api/dish_cal_predictor', methods=['GET'])
 @login_required
 def dish_cal_predictor():
     today = datetime.now()
@@ -87,12 +101,14 @@ def dish_cal_predictor():
     ).scalar() or 0
     print(f"Total calories consumed today: {total_day_calories}")
 
+#Heavy on calculations will be on backend
 @main.route('/exercise_calorie_forecast', methods=['GET', 'POST'])
 @login_required
 def exercise_calorie_forecast():
     current_user_id = current_user.UserID
     # Add logic here
 
+#Heavy on user interaction will be on the frontend
 @main.route('/goal_planner', methods=['GET', 'POST'])
 @login_required
 def goal_planner():
