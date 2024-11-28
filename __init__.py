@@ -1,4 +1,5 @@
 from flask import Flask
+from flask_cors import CORS
 from flask_sqlalchemy import SQLAlchemy
 from flask_login import LoginManager
 from config import DevelopmentConfig
@@ -15,6 +16,9 @@ def create_app():
     # Initialize extensions with the app
     db.init_app(app)
     login_manager.init_app(app)
+
+    #To setup for hybrid vue flask setup. Cors will be needed for external requests
+    CORS(app, resources={r"/api/*": {"origins": "*"}})
     
     # Register blueprints (routes)
     from routes import main as main_blueprint
