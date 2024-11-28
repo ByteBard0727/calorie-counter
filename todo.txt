@@ -1,0 +1,19 @@
+#1 create last login code function in utils to filter the last login using the session table filtering the previous session and the user_id
+#2 adjust the login html page to account for the changed login_time
+#3 adjust login html fixing the flash card for failed login's atm not working
+#4 remove json files from github
+#5 add month, quarter, half year, year consumed calories logic in utils
+#6 add month, quarter, half year, year burned calories logic in utils
+#7 add food, excercise and goal forms logic in Forms file
+#8 fix the api's for the dashboard, Home, Dish_cal_predictor, goal_planner in the routes file
+#9! create front-end for Dish_cal_predictorm goal_planner, dashboard
+#10 html templates for Exercise_calorie_forecast, weight_forecast
+
+# [Setup vm (Azure?)]
+# [dockerize app]
+# [jenkins pipelines webhooks]
+
+
+
+
+
