@@ -6,7 +6,6 @@ from models import User, UserDiet, Diet, UserExercise, UserGoal, UserWeight, Ses
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
 
-
 main = Blueprint('main', __name__)
 
 #first checking the user name by querying the User table searching for their username.
@@ -27,10 +26,10 @@ def login():
                 user_id=user.user_id,
                 login_time=login_time,
                 ip_address=request.remote_addr,
-                user_agent=request.header.get('User-Agent')
+                user_agent=request.headers.get('User-Agent')
             )
             db.session.commit()
-            return redirect(url_for('main.dashboard'))
+            return redirect(url_for('main.api_dashboard'))
         else:
             flash('Unable to login. Check your username and password.')
     return render_template('login.html', form=form)
@@ -61,7 +60,7 @@ def home():
 @main.route('/api/dashboard', methods=['GET'])
 @login_required
 def api_dashboard():
-    user = User.query.filter_by(UserID=current_user.UserID).first()
+    user = Session.query.filter_by(user_id=current_user.user_id).first()
 
     last_login = request.args.get('last_login', user.last_login)
     if user and user.last_login:
