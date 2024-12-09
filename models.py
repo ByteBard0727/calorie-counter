@@ -8,14 +8,14 @@ class User(db.Model, UserMixin):
     UserID = db.Column(db.Integer, primary_key=True)
     Weight = db.Column(db.Float)
     JoinDate = db.Column(db.DateTime, default=datetime.now)
-    calories = db.Column(db.Integer(5))
+    calories = db.Column(db.Integer)
     Username = db.Column(db.String(50), unique=True, nullable=False)
     Password = db.Column(db.String(128), nullable=False)
     Email = db.Column(db.String(255), unique=True, nullable=False)
     
     @login_manager.user_loader
-    def load_user(User_ID):
-        return User.query.get(int(User_ID))
+    def load_user(UserID):
+        return User.query.get(int(UserID))
 
     def set_password(self, password):
         self.Password = generate_password_hash(password)
