@@ -1,4 +1,4 @@
-#1 create last login code function in utils to filter the last login using the session table filtering the previous session and the user_id
+#1 create last login code function in utils to filter the last login using the session table filtering the previous session and the user_id also adjusting all the routes that use lastlogin and user_
 #2 adjust the login html page to account for the changed login_time
 #3 adjust login html fixing the flash card for failed login's atm not working
 #4 remove json files from github
@@ -13,7 +13,10 @@
 # [dockerize app]
 # [jenkins pipelines webhooks]
 
-
+#2.1
+# add Diet table columns to models.py
+# fix session_duration int he models.py file to minus the logout_time with login_time
+# add logout route in the routes file adjust it so that the session_duration field gets updated
 
 
 

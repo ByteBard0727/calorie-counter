@@ -1,5 +1,6 @@
+from sqlalchemy import desc
 from __init__ import db
-from models import UserDiet, UserExercise, UserWeight, UserGoal, User
+from models import UserDiet, UserExercise, UserWeight, UserGoal, User, Session
 from datetime import datetime, timedelta
 
 #time functions start and end of (day,week,month,year)
@@ -43,3 +44,13 @@ def get_total_week_consumed_calories(user_id):
         UserDiet.date_eaten >= start_of_week,
         UserDiet.date_eaten <= end_of_week
     ).scalar()
+
+def get_last_login(user_id):
+    login_time = db.session.query(Session.login_time).filter(
+        Session.user_id == user_id
+    ).order_by(desc(Session.login_time)).limit(2).all()
+    return login_time[1][0] if len(login_time) > 1 else None
+
+def update_session_duration(session):
+   if session.logout_time and session.login_time:
+    session.session_duration = (session.logout_time - session.login_time).total_seconds()
