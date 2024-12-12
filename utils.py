@@ -2,6 +2,8 @@ from sqlalchemy import desc
 from __init__ import db
 from models import UserDiet, UserExercise, UserWeight, UserGoal, User, Session
 from datetime import datetime, timedelta
+from flask_login import current_user
+from flask import request
 
 #time functions start and end of (day,week,month,year)
 def get_start_and_end_of_day():
@@ -51,6 +53,25 @@ def get_last_login(user_id):
     ).order_by(desc(Session.login_time)).limit(2).all()
     return login_time[1][0] if len(login_time) > 1 else None
 
-def update_session_duration(session):
-   if session.logout_time and session.login_time:
-    session.session_duration = (session.logout_time - session.login_time).total_seconds()
+def update_session_duration(user_session):
+   if user_session.logout_time and user_session.login_time:
+    user_session.session_duration = (user_session.logout_time - user_session.login_time).total_seconds()
+
+def record_logout(user_id):
+    user_session = Session.query.filter_by(user_id=current_user.user_id).order_by(Session.login_time.desc()).first()
+    if user_session:
+        logout_time = datetime.now()
+        update_session_duration(user_session)
+        db.session.commit()
+
+def record_login(user_id):
+    # Create a new session entry for the user
+    login_time = datetime.now()
+    user_session = Session(
+        user_id=user_id,
+        login_time=login_time,
+        ip_address=request.remote_addr,
+        user_agent=request.headers.get('User-Agent')
+    )
+    db.session.add(user_session)
+    db.session.commit()
