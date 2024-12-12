@@ -5,6 +5,7 @@ from forms import RegistrationForm, LoginForm
 from models import User, UserDiet, Diet, UserExercise, UserGoal, UserWeight, Session
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
+from utils import get_last_login, update_session_duration, record_logout, record_login
 
 main = Blueprint('main', __name__)
 
@@ -20,15 +21,7 @@ def login():
         user = User.query.filter_by(Username=form.Username.data).first()
         if user and user.check_password(form.Password.data):
             login_user(user)
-            
-            login_time = datetime.now
-            session_entry = Session(
-                user_id=user.user_id,
-                login_time=login_time,
-                ip_address=request.remote_addr,
-                user_agent=request.headers.get('User-Agent')
-            )
-            db.session.commit()
+            record_login(user.user_id)
             return redirect(url_for('main.api_dashboard'))
         else:
             flash('Unable to login. Check your username and password.')
@@ -60,29 +53,27 @@ def home():
 @main.route('/api/dashboard', methods=['GET'])
 @login_required
 def api_dashboard():
-    user = Session.query.filter_by(user_id=current_user.user_id).first()
-
-    last_login = request.args.get('last_login', user.last_login)
-    if user and user.last_login:
-        last_login = user.last_login.strftime('%d-%m-%Y %H:%M:%S')
+    last_login = get_last_login(current_user.user_id)
+    if last_login:
+        return render_template('index.html', last_login)
+    
     else:
-        last_login = "Welcome! this is the first time you have logged in"
+        last_login = datetime.now()
+        #Weight = 'Could not find prior weight records'
+        #calories = 'Could not find prior Caloric intake records'
 
-    Weight = "Could not find prior weight records"
-    calories = "Could not find prior Caloric intake records"
-
-    if user and user.Weight:
-        Weight = user.Weight
-    if user and user.calories:
-        calories = user.calories
-    current_date = datetime.now().strftime('%d-%m-%Y')
-    return render_template('index.html', current_date=current_date, last_login=last_login, Weight=Weight, calories=calories)
+    #if user and user.Weight:
+        #Weight = user.Weight
+    #if user and user.calories:
+        #calories = user.calories
+    #current_date = datetime.now().strftime('%d-%m-%Y')
+    return "Welcome! this is the first time you have logged in", render_template('index.html', last_login=last_login)
 
 #This forecast will stay in the back-end and will be handled by flask since it is heave on computation
 @main.route('/weight_forecast', methods=['GET', 'POST'])
 @login_required
 def weight_forecast():
-    current_user_id = current_user.UserID
+    current_user_id = current_user.user_id
     # Add logic here
 
 #Heavy on user interaction will be on the frontend
@@ -92,7 +83,7 @@ def dish_cal_predictor():
     today = datetime.now()
     start_of_day = datetime(today.year, today.month, today.day, 0, 0, 0)
     end_of_day = start_of_day + timedelta(days=1) - timedelta(seconds=1)
-    current_user_id = current_user.UserID
+    current_user_id = current_user.user_id
     total_day_calories = db.session.query(db.func.sum(UserDiet.caloric_value)).filter(
         UserDiet.user_id == current_user_id,
         UserDiet.date_eaten >= start_of_day,
@@ -104,11 +95,19 @@ def dish_cal_predictor():
 @main.route('/exercise_calorie_forecast', methods=['GET', 'POST'])
 @login_required
 def exercise_calorie_forecast():
-    current_user_id = current_user.UserID
+    current_user_id = current_user.user_id
+    return 'maintenance'
     # Add logic here
 
 #Heavy on user interaction will be on the frontend
 @main.route('/goal_planner', methods=['GET', 'POST'])
 @login_required
 def goal_planner():
-    print("maintenance")
+    return 'maintenance'
+
+@main.route('/logout', methods=['POST'])
+@login_required
+def logout():
+    record_logout()
+    logout_user()
+    return redirect(url_for('main.login'))
