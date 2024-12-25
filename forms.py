@@ -2,6 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo
 
+#Change to keep validation of the 
 class RegistrationForm(FlaskForm):
     Username = StringField('Username', validators=[DataRequired(), Length(min=4, max=100)])
     Email = StringField('Email', validators=[DataRequired(), Email()])
@@ -14,6 +15,7 @@ class LoginForm(FlaskForm):
     Password = PasswordField('Password', validators=[DataRequired()])
     submit = SubmitField('Login')
 
+#FRONTEND
 class FoodForm(FlaskForm):
     print("maintenance")
 class ExcerciseForm(FlaskForm):

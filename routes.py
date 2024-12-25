@@ -5,7 +5,7 @@ from forms import RegistrationForm, LoginForm
 from models import User, UserDiet, Diet, UserExercise, UserGoal, UserWeight, Session
 from datetime import datetime, timedelta
 from werkzeug.security import generate_password_hash, check_password_hash
-from utils import get_last_login, update_session_duration, record_logout, record_login
+from utils import get_last_login, update_session_duration, record_logout, record_login, average_calories_intake, get_start_and_end_of_period
 
 main = Blueprint('main', __name__)
 
@@ -22,7 +22,7 @@ def login():
         if user and user.check_password(form.Password.data):
             login_user(user)
             record_login(user.user_id)
-            return redirect(url_for('main.api_dashboard'))
+            return redirect(url_for('main.home'))
         else:
             flash('Unable to login. Check your username and password.')
     return render_template('login.html', form=form)
@@ -45,29 +45,46 @@ def register():
     return render_template('register.html', form=form)
 
 #This route will be covered by front-end as it will be heavy on user interaction
-@main.route('/home')
+@main.route('/home', methods=['GET', 'POST'])
 def home():
-    return "just testing"
+    return render_template('homepage.html')
 
-#This route will be covered by front-end as it will be heavy on user interaction
+#this route will be covered by 
 @main.route('/api/dashboard', methods=['GET'])
 @login_required
 def api_dashboard():
+    # Get the last login information
     last_login = get_last_login(current_user.user_id)
-    if last_login:
-        return render_template('index.html', last_login)
-    
-    else:
+    if not last_login:
         last_login = datetime.now()
-        #Weight = 'Could not find prior weight records'
-        #calories = 'Could not find prior Caloric intake records'
 
-    #if user and user.Weight:
-        #Weight = user.Weight
-    #if user and user.calories:
-        #calories = user.calories
-    #current_date = datetime.now().strftime('%d-%m-%Y')
-    return "Welcome! this is the first time you have logged in", render_template('index.html', last_login=last_login)
+    # Debugging
+    print(f"Last login: {last_login}")
+
+    # Ensure last_login is a valid datetime object
+    if not isinstance(last_login, datetime):
+        try:
+            last_login = datetime.strftime(last_login, "%Y-%m-%d %H:%M:%S")  # Adjust format if needed
+        except ValueError as e:
+            print(f"Error parsing last_login: {e}")
+            last_login = datetime.now()
+
+    # Fetch average caloric intake data
+    user_id = current_user.user_id
+    average_calories_today = average_calories_intake(user_id, 'day')
+    average_calories_this_week = average_calories_intake(user_id, 'week')
+    average_calories_this_month = average_calories_intake(user_id, 'month')
+    average_calories_this_year = average_calories_intake(user_id, 'year')
+
+    # Render the dashboard template with all required data
+    return render_template(
+        'dashboard.html',
+        last_login=last_login,
+        today_avg=average_calories_today,
+        week_avg=average_calories_this_week,
+        month_avg=average_calories_this_month,
+        year_avg=average_calories_this_year
+    )
 
 #This forecast will stay in the back-end and will be handled by flask since it is heave on computation
 @main.route('/weight_forecast', methods=['GET', 'POST'])
@@ -105,6 +122,7 @@ def exercise_calorie_forecast():
 def goal_planner():
     return 'maintenance'
 
+#Will remain on the backend since no user interaction
 @main.route('/logout', methods=['POST'])
 @login_required
 def logout():

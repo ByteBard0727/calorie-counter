@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <h1>Welcome to Your Dashboard</h1>
+    <p>Last Login: {{ last_login }}</p>
+    <h2>Caloric Intake Averages</h2>
+    <ul>
+        <li>Today: {{ today_avg }} kcal</li>
+        <li>This Week: {{ week_avg }} kcal</li>
+        <li>This Month: {{ month_avg }} kcal</li>
+        <li>This Year: {{ year_avg }} kcal</li>
+    </ul>
+    <!-- Example graph using Chart.js -->
+    <canvas id="caloriesChart" width="400" height="200"></canvas>
+    <script>
+        const ctx = document.getElementById('caloriesChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Today', 'This Week', 'This Month', 'This Year'],
+                datasets: [{
+                    label: 'Average Caloric Intake (kcal)',
+                    data: [{{ today_avg }}, {{ week_avg }}, {{ month_avg }}, {{ year_avg }}],
+                    borderColor: 'rgba(75, 192, 192, 1)',
+                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
